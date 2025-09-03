@@ -1,0 +1,9 @@
+{
+  "target": "Прочность при растяжении, МПа",
+  "best_model": "BayesianRidge",
+  "best_params": {
+    "alpha_1": 1e-06,
+    "alpha_2": 0.0001
+  },
+  "test_RMSE": 458.3899060782704
+}
