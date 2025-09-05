@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Интерфейс прогноза</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f2f2f2, #e6e6e6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .card {
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #0051a3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="card">
+      <div class="title">Модуль упругости при растяжении, ГПа</div>
+      <button class="btn" onclick="window.location.href='/modulus.html'">Загрузка данных и получение прогноза</button>
+    </div>
+
+    <div class="card">
+      <div class="title">Прочность при растяжении, МПа</div>
+      <button class="btn"onclick="window.location.href='/strength.html'">Загрузка данных и получение прогноза</button>
+    </div>
+
+    <div class="card">
+      <div class="title">Соотношение матрица‑наполнитель</div>
+      <button class="btn"onclick="window.location.href='/matrix.html'">Рекомендация доли в интервале [0;1]</button>
+    </div>
+
+  </div>
+
+</body>
+</html>

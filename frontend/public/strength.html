@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Прогноз прочности</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .form-container h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #222;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 15px;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #e9f7ef;
+      color: #155724;
+      font-size: 18px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Прогноз прочности при растяжении</h1>
+
+    <div class="form-group">
+      <label>Соотношение матрица-наполнитель</label>
+      <input type="number" step="any" id="input1">
+    </div>
+
+    <div class="form-group">
+      <label>Плотность, кг/м³</label>
+      <input type="number" step="any" id="input2">
+    </div>
+
+    <div class="form-group">
+      <label>Модуль упругости, ГПа</label>
+      <input type="number" step="any" id="input3">
+    </div>
+
+    <div class="form-group">
+      <label>Количество отвердителя, м.%</label>
+      <input type="number" step="any" id="input4">
+    </div>
+
+    <div class="form-group">
+      <label>Содержание эпоксидных групп, %</label>
+      <input type="number" step="any" id="input5">
+    </div>
+
+    <div class="form-group">
+      <label>Температура вспышки, °C</label>
+      <input type="number" step="any" id="input6">
+    </div>
+
+    <div class="form-group">
+      <label>Поверхностная плотность, г/м²</label>
+      <input type="number" step="any" id="input7">
+    </div>
+
+    <div class="form-group">
+      <label>Модуль упругости при растяжении, ГПа</label>
+      <input type="number" step="any" id="input8">
+    </div>
+
+    <div class="form-group">
+      <label>Потребление смолы, г/м²</label>
+      <input type="number" step="any" id="input9">
+    </div>
+
+    <div class="form-group">
+      <label>Угол нашивки, град</label>
+      <input type="number" step="any" id="input10">
+    </div>
+
+    <div class="form-group">
+      <label>Шаг нашивки</label>
+      <input type="number" step="any" id="input11">
+    </div>
+
+    <div class="form-group">
+      <label>Плотность нашивки</label>
+      <input type="number" step="any" id="input12">
+    </div>
+
+    <button class="button" onclick="calculateStrength()">Получить прогноз</button>
+
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <script>
+    function calculateStrength() {
+      const inputs = [];
+      for (let i = 1; i <= 12; i++) {
+        const value = parseFloat(document.getElementById('input' + i).value);
+        if (isNaN(value)) {
+          alert("Пожалуйста, заполните все поля корректно.");
+          return;
+        }
+        inputs.push(value);
+      }
+
+      // Здесь простой псевдопрогноз: среднее значение + небольшой случайный шум
+      const baseValue = inputs.reduce((a, b) => a + b, 0) / inputs.length;
+      const noise = (Math.random() - 0.5) * 0.3; // шум ±15%
+      const prediction = (baseValue * (1 + noise)).toFixed(2);
+
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerText = `Прогноз прочности при растяжении: ${prediction} МПа`;
+      resultBox.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
