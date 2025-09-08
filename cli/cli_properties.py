@@ -1,3 +1,4 @@
+import argparse
 import json
 
 import joblib
@@ -51,3 +52,32 @@ def predict(df,target):
     features = [c for c in df.columns if c != target]
     df[target] = model.predict(df[features])
     return df
+
+DEFAULT_TARGETS = [
+    "Модуль упругости при растяжении, ГПа",
+    "Прочность при растяжении, МПа",
+]
+
+def main():
+    ap = argparse.ArgumentParser(description="Простой CLI для прогнозов свойств (sklearn)")
+    ap.add_argument("--input", required=True, help="входной CSV с признаками")
+    ap.add_argument("--output", default="", help="выходной CSV; если не указан — печать в stdout")
+    ap.add_argument("--target", default="", help="конкретный таргет; если пусто — считаем оба")
+    args = ap.parse_args()
+
+    df = pd.read_csv(args.input)
+    df = to_numeric(df)
+
+    targets = [args.target] if args.target else DEFAULT_TARGETS
+    for t in targets:
+        df = predict(df, t)
+        print(f"[ok] предсказано: {t}")
+
+    if args.output:
+        df.to_csv(args.output, index=False)
+        print(f"Сохранено: {args.output}")
+    else:
+        print(df.to_csv(index=False))
+
+if __name__ == "__main__":
+    main()

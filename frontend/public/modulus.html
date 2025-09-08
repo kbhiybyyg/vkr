@@ -113,24 +113,20 @@
       <input type="number" step="any" id="input7" />
     </div>
     <div class="form-group">
-      <label>Прочность при растяжении, МПа</label>
+      <label>Потребление смолы, г/м²</label>
       <input type="number" step="any" id="input8" />
     </div>
     <div class="form-group">
-      <label>Потребление смолы, г/м²</label>
+      <label>Угол нашивки, град</label>
       <input type="number" step="any" id="input9" />
     </div>
     <div class="form-group">
-      <label>Угол нашивки, град</label>
+      <label>Шаг нашивки</label>
       <input type="number" step="any" id="input10" />
     </div>
     <div class="form-group">
-      <label>Шаг нашивки</label>
-      <input type="number" step="any" id="input11" />
-    </div>
-    <div class="form-group">
       <label>Плотность нашивки</label>
-      <input type="number" step="any" id="input12" />
+      <input type="number" step="any" id="input11" />
     </div>
 
     <button class="button" onclick="calculatePrediction()">Получить прогноз</button>
@@ -139,28 +135,60 @@
   </div>
 
   <script>
-    function calculatePrediction() {
-      // Пример простого "прогноза": усреднение + случайный шум
-      const inputs = [];
-      for (let i = 1; i <= 12; i++) {
-        const val = parseFloat(document.getElementById('input' + i).value);
-        if (isNaN(val)) {
-          alert("Пожалуйста, заполните все поля корректными числами.");
-          return;
+    async function calculatePrediction() {
+    const inputs = [];
+    for (let i = 1; i <= 11; i++) {
+      const val = parseFloat(document.getElementById('input' + i).value);
+      if (isNaN(val)) {
+        alert("Пожалуйста, заполните все поля корректными числами.");
+        return;
+      }
+      inputs.push(val);
+    }
+
+    // Формируем объект запроса в формате {"rows": [ {поля} ]}
+    const data = {
+      rows: [
+        {
+          "Соотношение матрица-наполнитель": inputs[0],
+          "Плотность, кг/м³": inputs[1],
+          "Модуль упругости, ГПа": inputs[2],
+          "Количество отвердителя, м.%": inputs[3],
+          "Содержание эпоксидных групп, %": inputs[4],
+          "Температура вспышки, °C": inputs[5],
+          "Поверхностная плотность, г/м²": inputs[6],
+          "Потребление смолы, г/м²": inputs[7],
+          "Угол нашивки, град": inputs[8],
+          "Шаг нашивки": inputs[9],
+          "Плотность нашивки": inputs[10]
         }
-        inputs.push(val);
+      ]
+    };
+
+    try {
+      const response = await fetch('/api/models/predict/modulus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
       }
 
-      // Псевдопрогноз: среднее всех значений + небольшой шум
-      const sum = inputs.reduce((a, b) => a + b, 0);
-      const avg = sum / inputs.length;
-      const noise = (Math.random() - 0.5) * 0.2; // ±10%
-      const prediction = (avg + noise).toFixed(2);
-
+      const result = await response.json();
+      console.log(result);
+      const prediction = result[0]["Модуль упругости при растяжении, ГПа"];
       const resultBox = document.getElementById("resultBox");
       resultBox.innerText = `Модуль упругости при растяжении: ${prediction} ГПа`;
       resultBox.style.display = "block";
+
+    } catch (error) {
+      alert("Ошибка при получении прогноза: " + error.message);
     }
+  }
   </script>
 
 </body>
