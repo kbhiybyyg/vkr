@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import pandas as pd
-from .utils import to_numeric, predict
+from .utils import to_numeric, predict, predict_ratio
+
 # from .ratio_utils import predict_ratio   # для TF-модели
 
 bp = Blueprint("api", __name__)
@@ -70,11 +71,11 @@ def predict_strength():
     df = predict(df, "Прочность при растяжении, МПа")
     return jsonify(df.to_dict(orient="records"))
 
-# # -------- соотношение (TF) --------
-# @bp.route("/predict/ratio", methods=["POST"])
-# def predict_ratio_endpoint():
-#     data = request.get_json(force=True)
-#     df = pd.DataFrame(data.get("rows", []))
-#     df = to_numeric(df)
-#     df = predict_ratio(df)   # отдельная функция для ratio_model_tf
-#     return jsonify(df.to_dict(orient="records"))
+# -------- соотношение (TF) --------
+@bp.route("/predict/ratio", methods=["POST"])
+def predict_ratio_endpoint():
+    data = request.get_json(force=True)
+    df = pd.DataFrame(data.get("rows", []))
+    df = to_numeric(df)
+    df = predict_ratio(df)   # отдельная функция для ratio_model_tf
+    return jsonify(df.to_dict(orient="records"))

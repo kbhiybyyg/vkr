@@ -82,7 +82,7 @@
 <body>
 
   <div class="form-container">
-    <h1>Прогноз соотношения</h1>
+    <h1>Прогноз соотношения матрица-наполнитель</h1>
 
     <div class="form-group"><label>Прочность при растяжении, МПа</label><input type="number" step="any" id="input1" /></div>
     <div class="form-group"><label>Плотность, кг/м³</label><input type="number" step="any" id="input2" /></div>
@@ -97,13 +97,13 @@
     <div class="form-group"><label>Шаг нашивки</label><input type="number" step="any" id="input11" /></div>
     <div class="form-group"><label>Плотность нашивки</label><input type="number" step="any" id="input12" /></div>
 
-    <button class="button" onclick="calculatePrediction()">Получить прогноз</button>
+    <button class="button" onclick="calculateRatio()">Получить прогноз</button>
 
     <div class="result" id="resultBox"></div>
   </div>
 
   <script>
-    function calculatePrediction() {
+    async function calculateRatio() {
       const inputs = [];
       for (let i = 1; i <= 12; i++) {
         const val = parseFloat(document.getElementById('input' + i).value);
@@ -114,15 +114,48 @@
         inputs.push(val);
       }
 
-      // Пример простой формулы — среднее значение + шум
-      const sum = inputs.reduce((a, b) => a + b, 0);
-      const avg = sum / inputs.length;
-      const noise = (Math.random() - 0.5) * 0.1; // ±5%
-      const prediction = (avg + noise).toFixed(2);
+      const data = {
+        rows: [
+          {
+            "Прочность при растяжении, МПа": inputs[0],
+            "Плотность, кг/м³": inputs[1],
+            "Модуль упругости, ГПа": inputs[2],
+            "Количество отвердителя, м.%": inputs[3],
+            "Содержание эпоксидных групп, %": inputs[4],
+            "Температура вспышки, °C": inputs[5],
+            "Поверхностная плотность, г/м²": inputs[6],
+            "Модуль упругости при растяжении, ГПа": inputs[7],
+            "Потребление смолы, г/м²": inputs[8],
+            "Угол нашивки, град": inputs[9],
+            "Шаг нашивки": inputs[10],
+            "Плотность нашивки": inputs[11]
+          }
+        ]
+      };
 
-      const resultBox = document.getElementById("resultBox");
-      resultBox.innerText = `Соотношение матрица‑наполнитель: ${prediction}`;
-      resultBox.style.display = "block";
+      try {
+        const response = await fetch('/api/models/predict/ratio', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Ошибка: ${response.status}`);
+        }
+
+        const result = await response.json();
+        const prediction = result[0]["Соотношение матрица-наполнитель"] || result[0]["prediction"] || Object.values(result[0])[0];
+
+        const resultBox = document.getElementById("resultBox");
+        resultBox.innerText = `Соотношение матрица-наполнитель: ${prediction}`;
+        resultBox.style.display = "block";
+
+      } catch (error) {
+        alert("Ошибка при получении прогноза: " + error.message);
+      }
     }
   </script>
 
