@@ -94,7 +94,6 @@ def predict_ratio(df: pd.DataFrame) -> pd.DataFrame:
     Xs = scaler.transform(np.nan_to_num(X, nan=0.0))
 
     y = model.predict(Xs, verbose=0).reshape(-1)
-    y = np.clip(y, *clip)
 
     out = df.copy()
     out['Соотношение матрица-наполнитель'] = y
