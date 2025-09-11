@@ -7,6 +7,8 @@ import numpy as np
 import os
 import pandas as pd
 
+from app.ratio_recomender import RatioRecommenderTF
+
 MODELS_DIR_RATIO = 'models/ratio'
 MODELS_DIR_PROPERTIES = 'models/properties'
 
@@ -60,41 +62,16 @@ def predict(df, target):
     features = [c for c in df.columns if c != target]
     df[target] = model.predict(df[features])
     return df
-
-
-def load_ratio_system(model_dir: str):
-    meta_path = os.path.join(model_dir, "meta.json")
-    scaler_pkl = os.path.join(model_dir, "scaler.pkl")
-    model_kr = os.path.join(model_dir, "keras_model.keras")
-
-    if not (os.path.isfile(meta_path) and os.path.isfile(scaler_pkl) and os.path.isfile(model_kr)):
-        raise FileNotFoundError(f"в {model_dir} нужны meta.json, scaler.pkl и keras_model.keras")
-
-    with open(meta_path, "r", encoding="utf-8") as f:
-        meta = json.load(f)
-    with open(scaler_pkl, "rb") as f:
-        scaler = pickle.load(f)
-    model = keras.models.load_model(model_kr)
-
-    feature_order = meta.get("feature_order")
-    if not feature_order:
-        raise ValueError("в meta.json нет 'feature_order'")
-    clip = tuple(meta.get("hyperparams", {}).get("clip_output", [0.0, 1.0]))
-    return model, scaler, feature_order, clip
+def load_ratio_system(model_dir: str) -> RatioRecommenderTF:
+    return RatioRecommenderTF.load(model_dir)
 
 
 def predict_ratio(df: pd.DataFrame) -> pd.DataFrame:
-    model, scaler, feature_order, clip = load_ratio_system(MODELS_DIR_RATIO)
-
-    missing = [c for c in feature_order if c not in df.columns]
+    rr = load_ratio_system(MODELS_DIR_RATIO)
+    missing = [c for c in rr.feature_order if c not in df.columns]
     if missing:
-        raise ValueError(f"в данных нет нужных колонок: {missing}")
-
-    X = df[feature_order].astype(float).values
-    Xs = scaler.transform(np.nan_to_num(X, nan=0.0))
-
-    y = model.predict(Xs, verbose=0).reshape(-1)
-
+        raise ValueError(f"нет колонок: {missing}")
+    y = rr.predict(df[rr.feature_order])
     out = df.copy()
     out['Соотношение матрица-наполнитель'] = y
     return out
